@@ -61,7 +61,7 @@ TEST_CASE("add_left"){
     CHECK_THROWS(tree.add_left(1,2));//no root-should throw exception
     tree.add_root(1);
     CHECK_NOTHROW(tree.add_left(1,2));
-    CHECK(*tree.begin_inorder()==2);//2 is the left child of the root
+   CHECK(*tree.begin_inorder()==2);//2 is the left child of the root
     //set new value to the root left child 
     CHECK_NOTHROW(tree.add_left(1,3));
     CHECK(*tree.begin_inorder()==3);//3 is the left child of the root
@@ -149,9 +149,13 @@ TEST_CASE("inorder -iterator"){
     //for each should work inorder
     string for_each_val;
     for(const string& val:tree){
+      // cout<<val<<endl;
         CHECK_NOTHROW(for_each_val+=val);
     }
+    //cout<<"visited"<<endl;
+    //cout<<"visited"<<endl;
     CHECK("213"==for_each_val);
+    //cout<<"visited"<<endl;
     CHECK_NOTHROW(tree.add_right("3","4").add_left("3","5"));
     /**current tree:
      *    1
@@ -162,11 +166,12 @@ TEST_CASE("inorder -iterator"){
      */ 
     string iterator_val; 
     for(auto it=tree.begin_inorder();it!=tree.end_inorder();++it){
+       
         CHECK_NOTHROW(iterator_val+=*it);
     }
     CHECK("21534"==iterator_val);
 
-    CHECK_NOTHROW(tree.add_left("2","6").add_left("2","2"));
+    CHECK_NOTHROW(tree.add_left("2","6").add_right("2","2"));
     /**current tree:
      *         1
      *        / \
@@ -182,7 +187,7 @@ TEST_CASE("inorder -iterator"){
     iterator_val="";
     //for each should return the same results
      for(const string& val:tree){
-        CHECK_NOTHROW(for_each_val+=val);
+        CHECK_NOTHROW(iterator_val+=val);
     }
     CHECK("6221534"==iterator_val);
 
@@ -229,7 +234,7 @@ TEST_CASE("preorder -iterator"){
     }
     CHECK("12354"==iterator_val);
 
-    CHECK_NOTHROW(tree.add_left("2","6").add_left("2","2"));
+    CHECK_NOTHROW(tree.add_left("2","6").add_right("2","2"));
     /**current tree:
      *         1
      *        / \
@@ -272,6 +277,7 @@ TEST_CASE("postorder -iterator"){
     for(auto it=tree.begin_postorder();it!=tree.end_postorder();++it){
         CHECK_NOTHROW(iterator_val+=*it);
     }
+    
     CHECK("231"==iterator_val);
     CHECK_NOTHROW(tree.add_right("3","4").add_left("3","5"));
     /**current tree:
@@ -285,9 +291,9 @@ TEST_CASE("postorder -iterator"){
     for(auto it=tree.begin_postorder();it!=tree.end_postorder();++it){
         CHECK_NOTHROW(iterator_val+=*it);
     }
-    CHECK("23541"==iterator_val);
+    CHECK("25431"==iterator_val);
 
-    CHECK_NOTHROW(tree.add_left("2","6").add_left("2","2"));
+    CHECK_NOTHROW(tree.add_left("2","6").add_right("2","2"));
     /**current tree:
      *         1
      *        / \
@@ -317,6 +323,19 @@ struct Person{
     string _name;
     int _id;
     Person(string name,int id):_name(name),_id(id){}
+    bool operator==(const Person& p1){
+        return this->_id==p1._id;
+    }
+    bool operator<(const Person& p1){
+        return this->_id<p1._id;
+    }
+    friend bool operator<(const Person& p1,const Person& p2){
+        return p1._id<p2._id;
+    }
+    // friend ostream& operator<<(ostream& os,const Person& p){
+    //     return os<<p._name;
+    // }
+    
 };
 /**
  * simple test to verify the BinaryTree can work with Objects
@@ -337,18 +356,20 @@ TEST_CASE("BinaryTree<Object> "){
     for(const Person& p:bt){
         CHECK_NOTHROW(names+=p._name);
     }
-    CHECK(names=="ZipiAviMatan");
+    CHECK(names=="ZipiEliMatan");
     names="";
+    cout<<"queue:";
     for(auto it=bt.begin_postorder();it!=bt.end_postorder();++it){
         names+=it->_name;
+       // cout<<it->_name<<endl;
     }
-    CHECK("ZipiMatanAvi"==names);
+    CHECK("ZipiMatanEli"==names);
     names="";
 
     for(auto it=bt.begin_preorder();it!=bt.end_preorder();++it){
         names+=it->_name;
     }
-    CHECK("AviZipiMatan"==names);
+    CHECK("EliZipiMatan"==names);
 
 }
 }
